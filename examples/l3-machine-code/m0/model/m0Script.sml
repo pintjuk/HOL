@@ -386,12 +386,16 @@ val ConditionPassed_def = Def
                   Mop(Not,EQ(Var("cond",F4),LW(15,4)))),Mop(Not,bVar"v"),
               bVar"v"))))
 ;
+val Raise'_def = Define `Raise' e =  \state.
+               if state.exception = NoException then
+                 state with exception := e
+               else state`
 val Raise_def = Def
-  ("Raise",Var("e",CTy"ARM_Exception"),
-   Close
-     (qVar"state",
-      Rupd
-        ("pending",TP[qVar"state",Mop(Some,Var("e",CTy"ARM_Exception"))])))
+  ("Raise",Var("e",CTy"ARM_Exception"),Call ("Raise'",ATy(qTy,qTy),
+                            Call
+                              ("UNPREDICTABLE",CTy"exception",
+                               LS"Interupt pending")))
+
 ;
 val CurrentModeIsPrivileged_def = Def
   ("CurrentModeIsPrivileged",AVar uTy,
